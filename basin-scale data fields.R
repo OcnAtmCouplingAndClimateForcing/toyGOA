@@ -26,11 +26,11 @@ nc.slp <- nc_open("/Users/MikeLitzow/Documents/R/FATE2/toyGOA/36BF63C72F8E709334
 # now process SLP data - first, extract dates
 raw <- ncvar_get(nc.slp, "TIME")  # seconds since 1-1-1970
 
-d <- dates(raw, origin = c(1,1,0001))
-yr <- years(d)
+date.slp <- dates(raw, origin = c(1,1,0001))
+year.slp <- years(d)
 
-x <- ncvar_get(nc.slp, "LON53_101")
-y <- ncvar_get(nc.slp, "LAT45_69")
+x.slp <- ncvar_get(nc.slp, "LON53_101")
+y.slp <- ncvar_get(nc.slp, "LAT45_69")
 
 SLP <- ncvar_get(nc.slp, "SLP", verbose = F)
 # Change data from a 3-D array to a matrix of monthly data by grid point:
@@ -41,9 +41,9 @@ SLP <- aperm(SLP, 3:1)
 SLP <- matrix(SLP, nrow=dim(SLP)[1], ncol=prod(dim(SLP)[2:3]))  
 
 # Keep track of corresponding latitudes and longitudes of each column:
-lat <- rep(y, length(x))   
-lon <- rep(x, each = length(y))   
-dimnames(SLP) <- list(as.character(d), paste("N", lat, "E", lon, sep=""))
+lat.slp <- rep(y.slp, length(x.slp))   
+lon.slp <- rep(x.slp, each = length(y.slp))   
+dimnames(SLP) <- list(as.character(date.slp), paste("N", lat.slp, "E", lon.slp, sep=""))
 
 # plot to check
 z <- colMeans(SLP)   # replace elements NOT corresponding to land with loadings!
@@ -72,19 +72,19 @@ download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?ss
 nc <- nc_open("~updated.sst")
 
 # get lat/long
-x.t <- ncvar_get(nc, "longitude")
-y.t <- ncvar_get(nc, "latitude")
-lat.t <- rep(y.t, length(x.t))   # Vector of latitudes
-lon.t <- rep(x.t, each = length(y.t))   # Vector of longitudes
+x.sst <- ncvar_get(nc, "longitude")
+y.sst <- ncvar_get(nc, "latitude")
+lat.sst <- rep(y.sst, length(x.sst))   # Vector of latitudes
+lon.sst <- rep(x.sst, each = length(y.sst))   # Vector of longitudes
 
 # assign dates
 raw <- ncvar_get(nc, "time") # seconds since January 1, 1970
 h <- raw/(24*60*60)
-d.t <- dates(h, origin = c(1,1,1970))
+d.sst <- dates(h, origin = c(1,1,1970))
 
 # year for processing later
-m <- as.numeric(months(d.t))
-yr <- as.numeric(as.character(years(d.t)))
+m <- as.numeric(months(d.sst))
+yr <- as.numeric(as.character(years(d.sst)))
 
 # get required sst data
 SST <- ncvar_get(nc, "sst")
@@ -96,11 +96,11 @@ SST <- matrix(SST, nrow=dim(SST)[1], ncol=prod(dim(SST)[2:3]))  # Change to matr
 
 # plot to check
 z <- colMeans(SST)   # replace elements NOT corresponding to land with loadings!
-z <- t(matrix(z, length(y.t)))  # Convert vector to matrix and transpose for plotting
-image(x.t,y.t,z, col=tim.colors(64), xlab = "", ylab = "", yaxt="n", xaxt="n")
-contour(x.t,y.t,z, add=T, col="white",vfont=c("sans serif", "bold"))
+z <- t(matrix(z, length(y.sst)))  # Convert vector to matrix and transpose for plotting
+image(x.sst,y.sst,z, col=tim.colors(64), xlab = "", ylab = "", yaxt="n", xaxt="n")
+contour(x.sst,y.sst,z, add=T, col="white",vfont=c("sans serif", "bold"))
 map('world2Hires',fill=F, xlim=c(130,250), ylim=c(20,66),add=T, lwd=1)
 
 # set names
-dimnames(SST) <- list(as.character(d.t), paste("N", lat.t, "E", lon.t, sep=""))
+dimnames(SST) <- list(as.character(d.sst), paste("N", lat.sst, "E", lon.sst, sep=""))
 
