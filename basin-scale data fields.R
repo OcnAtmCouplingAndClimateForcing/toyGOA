@@ -67,7 +67,7 @@ npgo <- read.table("~npgo", skip=10, nrows=828, fill=T, col.names = c("Year", "m
 
 # load SST
 # load ERSSTv5 data
-download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1950-01-01):1:(2019-03-01)][(0.0):1:(0.0)][(30):1:(66)][(150):1:(250)]", "~updated.sst")
+download.file("https://coastwatch.pfeg.noaa.gov/erddap/griddap/nceiErsstv5.nc?sst[(1948-01-01):1:(2019-05-01)][(0.0):1:(0.0)][(30):1:(66)][(150):1:(250)]", "~updated.sst")
 
 nc <- nc_open("~updated.sst")
 
@@ -103,3 +103,4 @@ map('world2Hires',fill=F, xlim=c(130,250), ylim=c(20,66),add=T, lwd=1)
 
 # set names
 dimnames(SST) <- list(as.character(d.t), paste("N", lat.t, "E", lon.t, sep=""))
+
